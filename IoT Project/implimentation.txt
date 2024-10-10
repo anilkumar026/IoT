@@ -1,0 +1,130 @@
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
+LiquidCrystal_I2C lcd(0x27, 16, 2);
+void printDetail(uint8_t type, int value);
+#define D6 6
+#define led1 3
+#define led2 4
+char input[12];
+int count = 0;
+int a;
+int p1 = 0, p2 = 0, p3 = 0, p4 = 0;
+int c1 = 0, c2 = 0, c3 = 0, c4 = 0;
+//void printDetail(uint8_t type, int value);
+double total = 0;
+int count_prod = 0;
+void setup ()
+{
+Serial.begin(9600);
+pinMode(D6, INPUT_PULLUP);
+pinMode(3, OUTPUT);
+pinMode(4, OUTPUT);
+// pinMode(6, OUTPUT);
+lcd.init();
+lcd.backlight();
+lcd.setCursor(0,0);
+lcd.print(" AUTOMATIC BILL");
+lcd.setCursor(0, 1);
+Serial.begin(9600);
+lcd.print(" SHOPPING CART ");
+delay (2000);
+lcd.clear();
+lcd.setCursor(0, 0);
+lcd.print("WELCOME TO");
+delay (2000);
+lcd.setCursor(3, 1);
+lcd.print("SUPER MARKET");
+delay (2000);
+lcd.clear();
+lcd.setCursor(0, 0);
+lcd.print("Plz Add iTem");
+}
+void loop()
+{
+int a = digitalRead(D6);
+if (Serial.available()) {
+count = 0;
+while (Serial.available() && count < 12)
+{
+input[count] = Serial.read();
+count++;
+delay(5);
+}
+//int a = digitalRead(D7);
+if (count == 12) {
+if ((strncmp(input, "1E0034B21D85", 12) == 0) && (a == 1))
+{
+lcd.clear();
+lcd.setCursor(0, 0);
+lcd.print("Butter Added ");
+lcd.setCursor(0, 1);
+lcd.print("Price :- 10.00 ");
+p1++;
+digitalWrite(led1, HIGH);
+digitalWrite(led2,LOW);
+// digitalWrite(buzzer, HIGH);
+delay(2000);
+total = total + 10.00;
+count_prod++;
+digitalWrite(3, LOW);
+digitalWrite(4, HIGH);
+// digitalWrite(buzzer, LOW);
+lcd.clear();
+lcd.setCursor(0, 0);
+lcd.print("Total Price:-");
+lcd.setCursor(0, 1);
+lcd.print(total);
+}
+else if ((strncmp(input, "1E0034B21D85", 12) == 0) && (a == 0))
+{
+if (p1 > 0)
+{
+lcd.clear();
+lcd.setCursor(0, 0);
+lcd.print("Butter Removed!!! ");
+digitalWrite(3, LOW);
+digitalWrite(4, HIGH);
+// digitalWrite(buzzer, HIGH);
+delay(2000);
+p1--;
+total = total - 10.00;
+count_prod--;
+lcd.clear();
+digitalWrite(4, LOW);
+digitalWrite(3, HIGH);
+// digitalWrite(buzzer, LOW);
+lcd.clear();
+lcd.setCursor(0, 0);
+lcd.print("Total Price :-");
+lcd.setCursor(0, 1);
+lcd.print(total);
+}
+else
+{
+lcd.clear();
+lcd.setCursor(0, 0);
+lcd.print("PLZ SCAN ITEMS ");
+lcd.setCursor(0,1);
+lcd.print("TO CART");
+}
+}
+else
+{
+lcd.clear();
+lcd.setCursor(0, 0);
+lcd.print("PLZ SCAN ITEMS ");
+33
+lcd.setCursor(0,1);
+lcd.print("TO CART");
+}
+}
+else
+{
+lcd.clear();
+lcd.setCursor(0, 0);
+lcd.print("PLZ SCAN ITEMS ");
+lcd.setCursor(0,1);
+lcd.print("TO CART");
+}
+}
+}
